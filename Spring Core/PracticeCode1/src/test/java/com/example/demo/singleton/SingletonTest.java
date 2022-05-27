@@ -1,6 +1,5 @@
 package com.example.demo.singleton;
 
-import com.example.demo.Appconfig;
 import com.example.demo.member.MemberService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

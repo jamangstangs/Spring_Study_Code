@@ -1,9 +1,7 @@
 package com.example.demo.beanfind;
 
-import com.example.demo.Appconfig;
 import com.example.demo.member.MemberService;
 import com.example.demo.member.MemberServiceImpl;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
