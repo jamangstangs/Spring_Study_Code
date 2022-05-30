@@ -33,6 +33,10 @@ dependencies {
 	implementation 'javax.inject:javax.inject:1'
 	// JSR-330 Provider 추가
 
+	// web library 추가
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	// web library 추가
+
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
