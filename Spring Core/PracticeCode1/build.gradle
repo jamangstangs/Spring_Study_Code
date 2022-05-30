@@ -28,6 +28,12 @@ dependencies {
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	// Lombok 추가
 
+	// JSR-330 Provider 추가
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'javax.inject:javax.inject:1'
+	// JSR-330 Provider 추가
+
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
