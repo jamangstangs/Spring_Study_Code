@@ -16,7 +16,7 @@ public class MappingClassController {
         return "add user";
     }
 
-    @GetMapping("/{userId")
+    @GetMapping("/{userId}")
     public String findUser(@PathVariable String userId) {
         return "get userId = " + userId;
     }
@@ -26,7 +26,7 @@ public class MappingClassController {
         return "update userId = " + userId;
     }
 
-    @DeleteMapping("/{userId")
+    @DeleteMapping("/{userId}")
     public String deleteUser(@PathVariable String userId) {
         return "delete userId = " + userId;
     }
