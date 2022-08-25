@@ -1,8 +1,9 @@
 package hello.jdbc.service;
 
-import hello.jdbc.connection.ConnectionConst;
 import hello.jdbc.domain.Member;
 import hello.jdbc.repository.MemberRepositoryV1;
+import hello.jdbc.repository.MemberRepositoryV2;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,25 +14,25 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import java.sql.SQLException;
 
 import static hello.jdbc.connection.ConnectionConst.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 /*
-* 기본 동작, 트랜잭션이 없어서 문제 발생
+* 트랜잭션 - 커넥션 파라미터 전달 방식 동기화
 * */
-class MemberServiceV1Test {
+@Slf4j
+class MemberServiceV2Test {
 
     public static final String Member_A = "memberA";
     public static final String Member_B = "memberB";
     public static final String Member_EX = "ex";
 
-    private MemberRepositoryV1 memberRepository;
-    private MemberServiceV1 memberService;
+    private MemberRepositoryV2 memberRepository;
+    private MemberServiceV2 memberService;
 
     @BeforeEach
     void before() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource(URL, USERNAME, PASSWORD);
-        memberRepository = new MemberRepositoryV1(dataSource);
-        memberService = new MemberServiceV1(memberRepository);
+        memberRepository = new MemberRepositoryV2(dataSource);
+        memberService = new MemberServiceV2(dataSource, memberRepository);
     }
 
     @AfterEach
@@ -51,12 +52,13 @@ class MemberServiceV1Test {
         memberRepository.save(memberB);
 
         //when
+        log.info("Start TX");
         memberService.accountTransfer(memberA.getMemberId(), memberB.getMemberId(), 2000);
+        log.info("End TX");
 
         //then
         Member findMemberA = memberRepository.findById(memberA.getMemberId());
         Member findMemberB = memberRepository.findById(memberB.getMemberId());
-        // 이 상황에서는 A는 2000원이 깎이고 B는 2000원이 들어와야한다.
         Assertions.assertThat(findMemberA.getMoney()).isEqualTo(8000);
         Assertions.assertThat(findMemberB.getMoney()).isEqualTo(12000);
     }
@@ -79,7 +81,7 @@ class MemberServiceV1Test {
         Member findMemberA = memberRepository.findById(memberA.getMemberId());
         Member findMemberB = memberRepository.findById(memberEx.getMemberId());
         // 이 상황에서는 A는 2000원이 깎이고 B는 2000원이 들어와야한다.
-        Assertions.assertThat(findMemberA.getMoney()).isEqualTo(8000);
+        Assertions.assertThat(findMemberA.getMoney()).isEqualTo(10000);
         Assertions.assertThat(findMemberB.getMoney()).isEqualTo(10000);
     }
 }
