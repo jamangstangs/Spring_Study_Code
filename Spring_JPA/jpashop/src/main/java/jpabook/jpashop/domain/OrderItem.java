@@ -35,6 +35,7 @@ public class OrderItem {
         getItem().addStock(count);
     }
 
+    // 조회 로
     public int getTotalPrice() {
         return orderPrice * count;
     }
