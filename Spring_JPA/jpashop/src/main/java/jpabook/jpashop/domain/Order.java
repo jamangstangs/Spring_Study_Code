@@ -1,8 +1,6 @@
 package jpabook.jpashop.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,7 +11,9 @@ import static javax.persistence.FetchType.*;
 
 @Entity
 @Table(name = "orders")
-@Getter @Setter
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order {
 
     @Id
@@ -79,6 +79,7 @@ public class Order {
         }
 
     }
+
     // 조회 로직
     // 전체 주문 가격 조회
     public int getTotalPrice() {
