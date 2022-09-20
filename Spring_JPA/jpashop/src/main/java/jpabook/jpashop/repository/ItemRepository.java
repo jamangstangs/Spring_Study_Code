@@ -17,6 +17,7 @@ public class ItemRepository {
         if (item.getId() == null) {
             em.persist(item);
         } else {
+            // 준영속 상태의 엔티티를 영속상태로 변경한다.
             em.merge(item);
         }
     }
