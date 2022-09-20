@@ -1,12 +1,17 @@
 package jpabook.jpashop.api;
 
+import jpabook.jpashop.domain.Address;
+import jpabook.jpashop.domain.Delivery;
 import jpabook.jpashop.domain.Order;
+import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,4 +44,52 @@ public class OrderSimpleApiController {
         return all;
 
     }
+
+    @GetMapping("/api/v2/simple-orders")
+    public List<SimpleOrderDto> orderV2() {
+        // N+1 -> 1 + N 문제, 쿼리 1번 실행했는데, 첫번째 N번 쿼리만큰 N개의 데이터가 조회된다.
+        // 1 + N + N -> 현재는 이 문제다. 근데 데이터가 2번 조회되니까 N = 2
+        // 1 + N + N  = 5
+
+        // 첫번째 N : Member n 번
+        // 두번째 N : Delibery n 번
+
+        // Eager로 바꿔도 소용없다.
+
+        // SQL 1회 실행 이후, Order가 2개 잇으니까, 아래 루프를 2번 돈다.
+        return orderRepository.findAllByCriteria(new OrderSearch()).stream()
+                .map(o -> new SimpleOrderDto(o))
+                .collect(Collectors.toList());
+        // 2번째 돌 때 Lazy 로딩 초기화,
+    }
+
+    @GetMapping("/api/v3/simple-orders")
+    public List<SimpleOrderDto> orderV3() {
+        // 필요한 것만 fetch Join으로
+        List<Order> orders = orderRepository.findAllWithMemberDelivery();
+        List<SimpleOrderDto> result = orders.stream()
+                .map(SimpleOrderDto::new)
+                .collect(Collectors.toList());
+        return result;
+
+    }
+
+    @Data
+    static class SimpleOrderDto {
+        private Long orderId;
+        private String name;
+        private LocalDateTime orderDate;
+        private OrderStatus orderStatus;
+        private Address address;
+
+        public SimpleOrderDto(Order order) {
+            orderId = order.getId();
+            name = order.getMember().getName(); //LAZY 초기화, 영속성 컨텍스트 찾아보고 없으니까 DB에서 찾아본다.
+            orderDate = order.getOrderDate();
+            orderStatus = order.getStatus();
+            address = order.getDelivery().getAddress(); //LAZY 초기화, 영속성 컨텍스트 찾아보고 없으니까 DB에서 찾아본다.
+
+        }
+    }
+
 }
