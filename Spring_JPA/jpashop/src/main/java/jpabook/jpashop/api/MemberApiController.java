@@ -2,14 +2,11 @@ package jpabook.jpashop.api;
 
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.service.MemberService;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.*;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,21 +14,38 @@ public class MemberApiController {
 
     private final MemberService memberService;
 
+    @GetMapping("/api/v1/members")
+    public List<Member> memberV1() {
+        return memberService.findMembers();
+    }
+
     @PostMapping("/api/v1/members")
-    public CreateMemberResposne saveMemberV1(@RequestBody @Valid Member member) {
+    public CreateMemberResponse saveMemberV1(@RequestBody @Valid Member member) {
         Long id = memberService.join(member);
-        return new CreateMemberResposne(id);
+        return new CreateMemberResponse(id);
     }
 
     @PostMapping("/api/v2/members")
-    public CreateMemberResposne saveMemberV2(@RequestBody @Valid CreateMemberRequest request) {
+    public CreateMemberResponse saveMemberV2(@RequestBody @Valid CreateMemberRequest request) {
 
         Member member = new Member();
         member.setName(request.getName());
 
         Long id = memberService.join(member);
-        return new CreateMemberResposne(id);
+        return new CreateMemberResponse(id);
 
+    }
+
+    @PutMapping("/api/v2/members/{id}")
+    public UpdateMemberResponse updateMemberV2(
+            @PathVariable("id") Long id,
+            @RequestBody @Valid UpdateMemberResponse request) {
+
+        // 커맨드, 쿼리 분리하는 스타일
+        memberService.update(id, request.getName());
+        Member findMember = memberService.findOne(id);
+
+        return new UpdateMemberResponse(findMember.getId(), findMember.getName());
     }
 
     @Data
@@ -41,13 +55,22 @@ public class MemberApiController {
 
 
     @Data
-    static class CreateMemberResposne {
+    static class CreateMemberResponse {
         private Long id;
 
-        public CreateMemberResposne(Long id) {
+        public CreateMemberResponse(Long id) {
             this.id = id;
         }
     }
 
+    @Data
+    @AllArgsConstructor
+    static class UpdateMemberResponse {
+        private Long id;
+        private String name;
 
+        protected UpdateMemberResponse() {
+
+        }
+    }
 }
