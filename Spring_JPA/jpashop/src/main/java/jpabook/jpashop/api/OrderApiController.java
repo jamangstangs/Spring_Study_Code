@@ -62,6 +62,7 @@ public class OrderApiController {
             orderDate = order.getOrderDate();
             orderStatus = order.getStatus();
             address = order.getDelivery().getAddress();
+            order.getOrderItems().stream().forEach(o -> o.getItem().getName());
             orderItems = order.getOrderItems();
         }
 
