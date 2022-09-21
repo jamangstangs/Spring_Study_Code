@@ -6,6 +6,7 @@ import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.OrderSimpleQueryDto;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,10 +69,14 @@ public class OrderSimpleApiController {
         // 필요한 것만 fetch Join으로
         List<Order> orders = orderRepository.findAllWithMemberDelivery();
         List<SimpleOrderDto> result = orders.stream()
-                .map(SimpleOrderDto::new)
+                .map(o -> new SimpleOrderDto(o))
                 .collect(Collectors.toList());
         return result;
+    }
 
+    @GetMapping("/api/v4/simple-orders")
+    public List<OrderSimpleQueryDto> ordersV4() {
+        return orderRepository.findOrderDtos();
     }
 
     @Data
@@ -84,11 +89,10 @@ public class OrderSimpleApiController {
 
         public SimpleOrderDto(Order order) {
             orderId = order.getId();
-            name = order.getMember().getName(); //LAZY 초기화, 영속성 컨텍스트 찾아보고 없으니까 DB에서 찾아본다.
+            name = order.getMember().getName();
             orderDate = order.getOrderDate();
             orderStatus = order.getStatus();
-            address = order.getDelivery().getAddress(); //LAZY 초기화, 영속성 컨텍스트 찾아보고 없으니까 DB에서 찾아본다.
-
+            address = order.getDelivery().getAddress();
         }
     }
 
