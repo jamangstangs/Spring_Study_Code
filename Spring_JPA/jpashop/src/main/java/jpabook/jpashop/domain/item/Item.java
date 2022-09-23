@@ -4,6 +4,7 @@ import jpabook.jpashop.domain.Category;
 import jpabook.jpashop.exception.NotEnoughtStockException;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import static javax.persistence.FetchType.LAZY;
 @DiscriminatorColumn(name = "dtype")
 @Getter
 @Setter
+@BatchSize(size = 100)
 public abstract class Item {
 
     @Id
