@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -29,7 +30,7 @@ public class OrderApiController {
         for (Order order : all) {
             order.getMember().getName();
             order.getDelivery().getAddress();
-            List<OrderItem> orderItems = order.getOrderItems();
+            List<OrderItem> orderItems = order.getOrderItems();  
             orderItems.stream().forEach(o -> o.getItem().getName());
         }
         return all;
@@ -53,9 +54,13 @@ public class OrderApiController {
                 .map(o -> new OrderDto(o)).collect(Collectors.toList());
         return result;
     }
+
     @GetMapping("/api/v3.1/orders")
-    public List<OrderDto> orderV_page() {
-        List<Order> orders = orderRepository.findAllWithMemberDelivery();
+    public List<OrderDto> orderV3_page(@RequestParam(value = "offset", defaultValue = "0") int offset,
+                                      @RequestParam(value = "limit", defaultValue = "100") int limit) {
+
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit);
+
         List<OrderDto> result = orders.stream()
                 .map(o -> new OrderDto(o)).collect(Collectors.toList());
         return result;
